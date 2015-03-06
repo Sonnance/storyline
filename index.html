@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Evan Wood</title>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="css/styles.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="jquery.cookie.js"></script>
+
+</head>
+
+<body>
+
+<div id="reset" class="btn btn-link text-danger">
+	Restart Story
+</div>
+
+<div id="stage">
+	<h2 id="title"></h2>
+
+	<p id="description"></p>
+
+	<div class="center btn-wrapper">
+		<div id="choice_a" class="btn btn-primary btn-block"></div>
+		<div id="choice_b" class="btn btn-primary btn-block"></div>
+	</div>
+
+</div>
+
+<span id="scene_1" class="scene" data-scene-title="Beginning"
+																 data-scene-description="It was a cold dark morning..."
+																 data-choice-a="Get up."
+																 data-choice-b="Go back to sleep."
+																 data-target-a="#scene_2a"
+																 data-target-b="#scene_2b"></span>
+
+<span id="scene_2a" class="scene" data-scene-title="Scene 2a" data-scene-description="It was a cold dark morning." data-choice-a="Yes" data-choice-b="No" data-target-a="#scene_3a" data-target-b="#scene_3b"></span>
+<span id="scene_2b" class="scene" data-scene-title="Scene 2b" data-scene-description="It was a cold dark morning?" data-choice-a="Yes" data-choice-b="No" data-target-a="#scene_3c" data-target-b="#scene_3d"></span>
+
+<span id="scene_3a" class="scene" data-scene-title="Scene 3a" data-scene-description="It was a cold dark morning." data-choice-a="Yes" data-choice-b="No" data-target-a="" data-target-b=""></span>
+<span id="scene_3b" class="scene" data-scene-title="Scene 3b" data-scene-description="It was a cold dark morning?" data-choice-a="Yes" data-choice-b="No" data-target-a="" data-target-b=""></span>
+<span id="scene_3c" class="scene" data-scene-title="Scene 3c" data-scene-description="It was a cold dark morning." data-choice-a="Yes" data-choice-b="No" data-target-a="" data-target-b=""></span>
+<span id="scene_3d" class="scene" data-scene-title="Scene 3d" data-scene-description="It was a cold dark morning?" data-choice-a="Yes" data-choice-b="No" data-target-a="" data-target-b=""></span>
+
+<script type="text/javascript">
+	function restart_story() {
+		$.removeCookie("bookmark");
+		location.reload();
+	}
+
+	function hide_empty_btn() {
+		$(".btn").each(function() {
+			if ($(this).is(":empty")) {
+				$(this).hide();
+			}
+		}) 
+	}
+
+	function fade_transition(element, new_content, duration) {
+		element.fadeOut(function() {
+			$(this).html(new_content).delay(duration).fadeIn()
+		});
+	}
+
+	function update_scene_details(scene_id) {
+		var scene             = $(scene_id),
+				scene_title       = scene.attr("data-scene-title"),
+				scene_description = scene.attr("data-scene-description"),
+				scene_choice_a    = scene.attr("data-choice-a"),
+				scene_choice_b    = scene.attr("data-choice-b"),
+				scene_target_a    = scene.attr("data-target-a"),
+				scene_target_b    = scene.attr("data-target-b");
+
+		fade_transition(title, scene_title, 0)
+		fade_transition(description, scene_description, 0)
+		fade_transition(choice_a, scene_choice_a, 1000)
+		fade_transition(choice_b, scene_choice_b, 1000)
+
+		choice_a.attr("target", scene_target_a);
+		choice_b.attr("target", scene_target_b);
+
+		hide_empty_btn();
+
+		$.cookie("bookmark", scene_id);
+	}
+
+	var stage       = $("#stage"),
+			title       = $("#title"),
+			description = $("#description"),
+			choice_a    = $("#choice_a"),
+			choice_b    = $("#choice_b");
+
+	$(window).load(function(){
+		if ($.cookie("bookmark") != null) {
+			update_scene_details($.cookie("bookmark"));
+		} else {
+			update_scene_details("#scene_1");
+		}
+	})
+
+	$(".btn").click(function(){
+		var next_scene = $(this).attr("target");
+
+		update_scene_details(next_scene);
+	})
+
+	$("#reset").click(function() {
+		if (confirm("Are you sure you want to restart? This will permanently delete your save file.")) {
+			restart_story();
+		}
+		return false;
+	})
+</script>
+	
+</body>
+
+</html>
